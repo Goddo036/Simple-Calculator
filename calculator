@@ -1,0 +1,174 @@
+import 'dart:ui';
+import 'package:flutter/material.dart';
+
+void main() => runApp(MaterialApp(
+      title: '',
+      theme: ThemeData(
+        primaryColor: Colors.green,
+        accentColor: Colors.greenAccent,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: YPForm(),
+    ));
+
+class YPForm extends StatefulWidget {
+  const YPForm({Key? key}) : super(key: key);
+
+  @override
+  State<YPForm> createState() => _YPFormState();
+}
+
+class _YPFormState extends State<YPForm> {
+  var _currencies = ['Naira', 'Dollars', 'Pounds', 'Rupees', 'Others'];
+  final _minimumPadding = 5;
+  var _currentItemSelected = '';
+
+  @override
+  void initState() {
+    _currentItemSelected = _currencies[0];
+  }
+
+  TextEditingController principalController = TextEditingController();
+  TextEditingController princiController = TextEditingController();
+  TextEditingController palController = TextEditingController();
+  var displayResult = '';
+  @override
+  Widget build(BuildContext context) {
+    TextStyle textStyle = Theme.of(context).textTheme.title;
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        title: Text('Simple Interest Calculator'),
+        centerTitle: true,
+      ),
+      body: Form(
+        child: Padding(
+          padding: EdgeInsets.all(_minimumPadding * 10),
+          child: ListView(
+            children: [
+              Image.asset('images/anime.jpg'),
+              Padding(
+                padding: EdgeInsets.only(
+                    top: _minimumPadding * 5, bottom: _minimumPadding * 5),
+                child: TextField(
+                  style: textStyle,
+                  controller: principalController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Principal',
+                    hintText: 'Enter Principal e.g. 1500',
+                    labelStyle: textStyle,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                    top: _minimumPadding * 5, bottom: _minimumPadding * 5),
+                child: TextField(
+                  style: textStyle,
+                  controller: princiController,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: 'Rate of Principal',
+                    hintText: 'In Percent',
+                    labelStyle: textStyle,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      style: textStyle,
+                      controller: palController,
+                      keyboardType: TextInputType.number,
+                      decoration: InputDecoration(
+                        labelText: 'Term',
+                        labelStyle: textStyle,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: DropdownButton<String>(
+                        items: _currencies.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                        value: _currentItemSelected,
+                        onChanged: (newValueSelected) {
+                          _onDropDownItemSelected(newValueSelected);
+                        }),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  RaisedButton(
+                    color: Theme.of(context).primaryColorDark,
+                    textColor: Theme.of(context).primaryColorLight,
+                    child: Text(
+                      'Calculate',
+                      textScaleFactor: 1.5,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        this.displayResult = _calculateTotalReturn();
+                      });
+                    },
+                  ),
+                  RaisedButton(
+                    color: Theme.of(context).primaryColorLight,
+                    textColor: Theme.of(context).primaryColorDark,
+                    child: Text(
+                      'Reset',
+                      textScaleFactor: 1.5,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        _reset();
+                      });
+                    },
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Container(
+                  child: Text(this.displayResult),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _onDropDownItemSelected(newValueSelected) {
+    setState(() {
+      this._currentItemSelected = newValueSelected;
+    });
+  }
+
+  _calculateTotalReturn() {
+    double principal = double.parse(principalController.text);
+    double princi = double.parse(princiController.text);
+    double pal = double.parse(palController.text);
+
+    double totalAmountPayable = principal + (principal * princi * pal) / 100;
+
+    String result =
+        'After $pal years, your investment will be worth $totalAmountPayable$_currentItemSelected';
+    return result;
+  }
+
+  void _reset() {
+    principalController.text = '';
+    princiController.text = '';
+    palController.text = '';
+    displayResult = '';
+    _currentItemSelected = _currencies[0];
+  }
+}
